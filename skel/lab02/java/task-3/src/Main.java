@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Main {
@@ -55,7 +57,33 @@ public class Main {
         private int getResult() {
             // TODO: Aflati punctajul maxim pe care il puteti obtine
             // planificand optim temele.
-            return 0;
+
+            // descrescator dupe scorul temelor
+            Arrays.sort(hws, new Comparator<Homework>() {
+                public int compare(Homework a, Homework b) {
+                    return (b.score < a.score) ? -1 : 1;
+                }
+            });
+
+            int max_deadline = 0;
+            for (Homework homework : hws) {
+                max_deadline = Math.max(max_deadline, homework.deadline);
+            }
+
+            boolean[] used = new boolean[max_deadline + 1];
+            Arrays.fill(used, false);
+
+            int maxScore = 0;
+            for (Homework homework : hws) {
+                for (int t = homework.deadline; t > 0; t--) {
+                    if (!used[t]) {
+                        used[t] = true;
+                        maxScore += homework.score;
+                        break;
+                    }
+                }
+            }
+            return maxScore;
         }
     }
 
