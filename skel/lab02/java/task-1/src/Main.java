@@ -1,12 +1,15 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Main {
     static class Obj {
         public int weight;
         public int price;
+        public double ratio;
 
         public Obj() {
             weight = 0;
@@ -54,9 +57,28 @@ public class Main {
         }
 
         private double getResult() {
-            // TODO: Aflati profitul maxim care se poate obtine cu
-            // obiectele date.
-            return 0;
+            for (int i = 0; i < n; i++) {
+                objs[i].ratio = ((double) objs[i].price) / ((double) objs[i].weight);
+            }
+
+            Arrays.sort(objs, new Comparator<Obj>() {
+                public int compare(Obj a, Obj b) {
+                    return b.ratio < a.ratio ? -1 : 1;
+                }
+            });
+
+            double maxPrice = 0;
+            for (Obj obj : objs) {
+                if (obj.weight <= w) {
+                    w -= obj.weight;
+                    maxPrice += (double) obj.price;
+                } else {
+                    maxPrice += (double) obj.price * ((double) w / (double) obj.weight);
+                    break;
+                }
+            }
+
+            return maxPrice;
         }
     }
 

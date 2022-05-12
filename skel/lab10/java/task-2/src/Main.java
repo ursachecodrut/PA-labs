@@ -38,6 +38,48 @@ public class Main {
             }
         };
 
+        // BellmanFordResult bellman(int source, int nodes, ArrayList<Edge> edges) {
+        // // Initializam vectorul de distante cu distante infinite.
+        // // vector<int> d(nodes + 1, INF);
+        // // vector<int> p(nodes + 1, 0);
+        // int[] d = new int[n + 1];
+        // int[] p = new int[n + 1];
+
+        // for (int i = 0; i <= n; i++) {
+        // d[i] = INF;
+        // }
+
+        // // Setez sursa la distanta 0.
+        // d[source] = 0;
+
+        // // Fac N - 1 relaxari.
+        // for (int i = 1; i <= n - 1; i++) {
+        // for (Edge edge : edges) {
+        // if (d[edge.node] + edge.w < d[edge.neigh]) {
+        // d[edge.neigh] = d[edge.node] + edge.w;
+        // p[edge.neigh] = edge.node;
+        // }
+        // }
+        // }
+
+        // // Verific daca mai poate fi updatata distanta.
+        // for (Edge edge : edges) {
+        // if (d[edge.node] + edge.w < d[edge.neigh]) {
+        // return new BellmanFordResult(true, new ArrayList<>(), new ArrayList<>());
+        // }
+        // }
+
+        // // Toate nodurile catre care distanta este inca INF nu pot fi atinse din
+        // for (int i = 1; i <= n; i++) {
+        // if (d[i] == INF) {
+        // d[i] = -1;
+        // }
+        // }
+
+        // // return {false, d, p};
+        // // return new BellmanFordResult(false, d, p);
+        // }
+
         // structura folosita pentru a stoca distanta, cat si vectorul de parinti
         // folosind algoritmul Dijkstra
         public class DijkstraResult {
@@ -152,14 +194,17 @@ public class Main {
             //
             // Atentie:
             // O muchie este tinuta ca o pereche (nod adiacent, cost muchie):
-            //     adj[node][i] == (neigh, w) - unde neigh este al i-lea vecin al lui node, iar (node, neigh) are cost w.
+            // adj[node][i] == (neigh, w) - unde neigh este al i-lea vecin al lui node, iar
+            // (node, neigh) are cost w.
             //
             //
-            // Trebuie sa intoarceti o structura de tipul JohnsonResult, care contine membrii
-            //  * has_cycle = true, daca a fost intalnit un ciclu de cost negativ
-            //  * d = matricea de distante, unde se seteaza d[u][v] = 0, daca nu a fost gasit
+            // Trebuie sa intoarceti o structura de tipul JohnsonResult, care contine
+            // membrii
+            // * has_cycle = true, daca a fost intalnit un ciclu de cost negativ
+            // * d = matricea de distante, unde se seteaza d[u][v] = 0, daca nu a fost gasit
             // un drum de la u la v. d[u][u] = 0
-            //  * p = matricea de parinti, unde p[u][v] = parintele nodului v, pornind din nodul u.
+            // * p = matricea de parinti, unde p[u][v] = parintele nodului v, pornind din
+            // nodul u.
             // si p[u][v] = 0, daca v nu se poate atinge din nodul u
             int d[][] = new int[n + 1][n + 1];
             int p[][] = new int[n + 1][n + 1];
@@ -169,6 +214,25 @@ public class Main {
                     p[u][v] = 0;
                 }
             }
+
+            // aux node
+            for (int i = 1; i <= n; i++) {
+                adj[0].add(new Pair(i, 0));
+            }
+
+            ArrayList<Edge> w = new ArrayList<>();
+
+            for (int i = 0; i <= n; i++) {
+                for (int j = 0; j < adj[i].size(); j++) {
+                    w.add(new Edge(i, adj[i].get(j).destination, adj[i].get(j).cost));
+                }
+            }
+
+            // for (Edge edge : w) {
+            // if (edge.w != INF) {
+            // edge.w = edge.w + (h[edge.node] - h[edge.neigh]);
+            // }
+            // }
 
             return new JohnsonResult(false, d, p);
         }

@@ -25,6 +25,8 @@ public class Main {
         // In aceasta problema, costurile sunt strict pozitive.
         int w[][];
 
+        public static final int INF = (int) 1e9;
+
         // structura folosita pentru a stoca matricea de distante, matricea
         // de parinti folosind algoritmul RoyFloyd.
         public class RoyFloydResult {
@@ -45,7 +47,7 @@ public class Main {
         private void readInput() {
             try {
                 Scanner sc = new Scanner(new BufferedReader(new FileReader(
-                                INPUT_FILE)));
+                        INPUT_FILE)));
                 n = sc.nextInt();
                 w = new int[n + 1][n + 1];
                 for (int i = 1; i <= n; i++) {
@@ -62,7 +64,7 @@ public class Main {
         private void writeOutput(RoyFloydResult res) {
             try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(
-                                OUTPUT_FILE));
+                        OUTPUT_FILE));
                 StringBuilder sb = new StringBuilder();
                 for (int x = 1; x <= n; x++) {
                     for (int y = 1; y <= n; y++) {
@@ -85,18 +87,44 @@ public class Main {
             //
             // Atentie:
             // O muchie (x, y, w) este reprezentata astfel in matricea ponderilor:
-            //  w[x][y] = w;
+            // w[x][y] = w;
             // Daca nu exista o muchie intre doua noduri x si y, in matricea
             // ponderilor se va afla valoarea 0:
-            //  w[x][y] = 0;
+            // w[x][y] = 0;
             //
             // Trebuie sa populati matricea d[][] (declarata mai sus):
-            //  d[x][y] = distanta minima intre nodurile x si y, daca exista drum.
-            //  d[x][y] = 0 daca nu exista drum intre x si y.
-            //          * implicit: d[x][x] = 0 (distanta de la un nod la el insusi).
+            // d[x][y] = distanta minima intre nodurile x si y, daca exista drum.
+            // d[x][y] = 0 daca nu exista drum intre x si y.
+            // * implicit: d[x][x] = 0 (distanta de la un nod la el insusi).
             //
             int d[][] = new int[n + 1][n + 1];
             int p[][] = new int[n + 1][n + 1];
+
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    d[i][j] = w[i][j] == 0 ? INF : w[i][j];
+                    p[i][j] = (w[i][j] != INF ? i : null);
+                }
+            }
+
+            for (int k = 1; k <= n; k++) {
+                for (int i = 1; i <= n; i++) {
+                    for (int j = 1; j <= n; j++) {
+                        if (d[i][k] + d[k][j] < d[i][j]) {
+                            d[i][j] = d[i][k] + d[k][j];
+                            p[i][j] = p[k][j];
+                        }
+                    }
+                }
+            }
+
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    if (d[i][j] == INF || i == j) {
+                        d[i][j] = 0;
+                    }
+                }
+            }
 
             return new RoyFloydResult(d, p);
         }
