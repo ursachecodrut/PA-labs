@@ -11,6 +11,8 @@ public class Main {
         int n, S;
         int[] v;
 
+        public static final int INF = (int) 1e9;
+
         public void solve() {
             readInput();
             writeOutput(getResult());
@@ -45,7 +47,19 @@ public class Main {
             // TODO: Aflati numarul minim de monede ce poate fi folosit pentru a
             // obtine suma S. Tipurile monedelor sunt stocate in vectorul v, de
             // dimensiune n.
-            return 0;
+
+            int[] dp = new int[S + 1];
+
+            dp[0] = 0;
+            for (int s = 1; s <= S; s++) {
+                dp[s] = INF;
+                for (int coinValue : v) {
+                    if (coinValue <= s) {
+                        dp[s] = Math.min(dp[s], 1 + dp[s - coinValue]);
+                    }
+                }
+            }
+            return (dp[S] != INF ? dp[S] : -1);
         }
     }
 

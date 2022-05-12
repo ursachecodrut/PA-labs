@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Collections;
 
 public class Main {
     static class Result {
@@ -74,6 +75,44 @@ public class Main {
             // 2.2. Reconstructia CMLSC. Se puncteaza orice subsir comun maximal
             // valid. Solutia pentru aceasta cerinta se va pune in
             // ``result.subsequence``.
+
+            int[][] dp = new int[n + 1][m + 1];
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= m; j++) {
+                    if (v[i] == w[j]) {
+                        dp[i][j] = 1 + dp[i - 1][j - 1];
+                    } else {
+                        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                    }
+                }
+            }
+
+            result.len = dp[n][m];
+
+            if (result.len == 0) {
+                return result;
+            }
+
+            int i = n, j = m;
+            int crt = result.len - 1; // crt va tine pozitia pe care urmeaza sa punem o valoare in solutie
+            while (i > 0 && j > 0) {
+                if (v[i] == w[j]) { // v[i], w[j] a extins candva o solutie
+                    result.subsequence.add(v[i]); // adaugam elementul v[i] la solutie
+                    crt--;
+
+                    --i; // i,j a extins i-1, j-1 (din recurenta)
+                    --j;
+                    continue;
+                }
+
+                if (dp[i][j] == dp[i - 1][j]) {
+                    --i; // ori w[j] a extins singur o solutie
+                } else {
+                    --j; // ori v[i] a extins singur o solutie
+                }
+            }
+
+            Collections.reverse(result.subsequence);
 
             return result;
         }
