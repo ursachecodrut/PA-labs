@@ -14,7 +14,7 @@ public class Main {
         public static final String OUTPUT_FILE = "out";
 
         // numarul maxim de noduri
-        public static final int NMAX = (int)1e5 + 5; // 10^5 + 5 = 100.005
+        public static final int NMAX = (int) 1e5 + 5; // 10^5 + 5 = 100.005
 
         // n = numar de noduri, m = numar de muchii/arce
         int n, m;
@@ -32,7 +32,7 @@ public class Main {
         private void readInput() {
             try {
                 Scanner sc = new Scanner(new BufferedReader(new FileReader(
-                                INPUT_FILE)));
+                        INPUT_FILE)));
                 n = sc.nextInt();
                 m = sc.nextInt();
 
@@ -56,7 +56,7 @@ public class Main {
         private void writeOutput(ArrayList<Integer> topsort) {
             try {
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
-                                OUTPUT_FILE)));
+                        OUTPUT_FILE)));
                 for (Integer node : topsort) {
                     pw.printf("%d ", node);
                 }
@@ -67,14 +67,35 @@ public class Main {
             }
         }
 
+        void DFS(int source, boolean[] visited, ArrayList<Integer> toposort) {
+            visited[source] = true;
+            for (Integer neigh : adj[source]) {
+                if (!visited[neigh]) {
+                    DFS(neigh, visited, toposort);
+                }
+            }
+
+            toposort.add(source);
+        }
+
         private ArrayList<Integer> getResult() {
-            // TODO: Faceti sortarea topologica a grafului stocat cu liste de adiacenta din adj.
+            // TODO: Faceti sortarea topologica a grafului stocat cu liste de adiacenta din
+            // adj.
             // *******
             // ATENTIE: nodurile sunt indexate de la 1 la n.
             // *******
 
-            ArrayList<Integer> topsort = new ArrayList<>();
-            return topsort;
+            ArrayList<Integer> toposort = new ArrayList<>();
+            boolean[] visited = new boolean[n + 1];
+            for (int i = 1; i <= n; i++) {
+                if (!visited[i]) {
+                    DFS(i, visited, toposort);
+                }
+            }
+
+            Collections.reverse(toposort);
+
+            return toposort;
         }
     }
 
