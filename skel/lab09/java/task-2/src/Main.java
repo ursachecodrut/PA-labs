@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Collections;
 
 public class Main {
     static class Task {
@@ -17,8 +18,8 @@ public class Main {
         //
         // parent[node] = parintele nodului node
         // Cazuri particulare:
-        //      * parent[source] = -1
-        //      * parent[node] = -1, daca node nu este accesibil din nodul sursa.
+        // * parent[source] = -1
+        // * parent[node] = -1, daca node nu este accesibil din nodul sursa.
         //
         int[] parent;
 
@@ -34,7 +35,7 @@ public class Main {
         private void readInput() {
             try {
                 Scanner sc = new Scanner(new BufferedReader(new FileReader(
-                                INPUT_FILE)));
+                        INPUT_FILE)));
                 n = sc.nextInt();
                 source = sc.nextInt();
                 destination = sc.nextInt();
@@ -52,7 +53,7 @@ public class Main {
         private void writeOutput(ArrayList<Integer> result) {
             try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(
-                                OUTPUT_FILE));
+                        OUTPUT_FILE));
                 StringBuilder sb = new StringBuilder();
 
                 if (result.isEmpty()) {
@@ -72,13 +73,42 @@ public class Main {
 
         private ArrayList<Integer> getResult() {
             //
-            // TODO: Reconstituiti drumul de cost minim de la nodul source la nodul destination
+            // TODO: Reconstituiti drumul de cost minim de la nodul source la nodul
+            // destination
             // folosind vectorul de parinti parent.
             //
-            // In cazul in care exista nu exista un drum de la sursa la destinatie, returnati
+            // In cazul in care exista nu exista un drum de la sursa la destinatie,
+            // returnati
             // un vector gol (a.k.a. return new ArrayList<>();).
             //
             ArrayList<Integer> path = new ArrayList<>();
+
+            // Pornesc de la nodul destinatie si ii caut parintele.
+            int node = destination;
+
+            // Daca parintele lui node este -1, inseamna ca node este chiar source
+            // sau node nu este accesibil din nodul source.
+            while (parent[node] != -1) {
+                // Daca el exista, atunci poate face dintr-un path valid
+                path.add(node);
+
+                // Se cauta parintele nodului curent
+                node = parent[node];
+            }
+
+            // Daca node nu este sursa, inseamna ca nu am putut ajunge inapoi
+            // la nodul sursa, deci trebuie returnat un vector gol.
+            if (node != source) {
+                return new ArrayList<Integer>();
+            }
+
+            // Node este sursa, deci se adauga la path.
+            path.add(source);
+
+            // Se inverseaza ordinea nodurilor, pentru a obtine un drum
+            // source - node_1 - node_2 - ... - node_k - destination,
+            // unde un node este parintele vecinului de la dreapta.
+            Collections.reverse(path);
             return path;
         }
     }

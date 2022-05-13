@@ -5,7 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Main {
     static class Task {
@@ -118,9 +121,38 @@ public class Main {
             List<Integer> p = new ArrayList<>();
 
             for (int i = 0; i <= n; i++) {
-                d.add(0);
+                d.add(INF);
                 p.add(0);
             }
+
+            Queue<Pair> pq = new PriorityQueue<>();
+            d.set(source, 0);
+            pq.add(new Pair(source, 0));
+
+            while (!pq.isEmpty()) {
+                int cost = pq.peek().cost;
+                int node = pq.poll().destination;
+
+                if (cost > d.get(node)) {
+                    continue;
+                }
+
+                for (Pair pair : adj[node]) {
+                    int neigh = pair.destination;
+                    int w = pair.cost;
+
+                    if (d.get(node) + w < d.get(neigh)) {
+                        d.set(neigh, d.get(node) + w);
+                        p.set(neigh, node);
+                        pq.add(new Pair(neigh, d.get(neigh)));
+                    }
+                }
+            }
+
+            Collections.replaceAll(d, INF, -1);
+            for (int i = 1; i <= n; i++)
+                if (d.get(i) == INF)
+                    d.set(i, -1);
 
             return new DijkstraResult(d, p);
 

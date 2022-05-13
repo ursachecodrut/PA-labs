@@ -119,6 +119,60 @@ public class Main {
             }
         }
 
+        private BellmanFordResult bellman(int source, int nodes, List<Edge> edges) {
+            // Initializam distantele catre toate nodurile cu infinit
+
+            List<Integer> d = new ArrayList<>();
+            List<Integer> p = new ArrayList<>();
+
+            // Initializam distantele la infinit
+            for (int node = 0; node <= nodes; node++) {
+                d.add(INF);
+                p.add(0);
+            }
+
+            // Setez sursa la distanta 0.
+            d.set(source, 0);
+
+            // Fac N - 1 relaxari.
+            for (int i = 1; i <= nodes - 1; i++) {
+                // Parcurg toate muchiile:
+                for (Edge edge : edges) {
+                    int node = edge.node;
+                    int neigh = edge.neigh;
+                    int w = edge.w;
+                    // Se imbunatateste distanta?
+                    if (d.get(node) + w < d.get(neigh)) {
+                        // Actualizam distanta si parintele.
+                        d.set(neigh, d.get(node) + w);
+                        p.set(neigh, node);
+                    }
+                }
+            }
+
+            // Verific daca mai poate fi updatata distanta.
+            for (var edge : edges) {
+                int node = edge.node;
+                int neigh = edge.neigh;
+                int w = edge.w;
+                // Se imbunatateste distanta?
+                if (d.get(node) + w < d.get(neigh)) {
+                    // Am gasit un ciclu de cost negativ.
+                    return new BellmanFordResult(true, new ArrayList<>(), new ArrayList<>());
+                }
+            }
+
+            // Toate nodurile catre care distanta este inca INF nu pot fi atinse din
+            // nodul source, deci le setam pe -1.
+            for (int node = 1; node <= nodes; node++) {
+                if (d.get(node) == INF) {
+                    d.set(node, -1);
+                }
+            }
+
+            return new BellmanFordResult(false, d, p);
+        }
+
         private BellmanFordResult getResult() {
             //
             // TODO: Gasiti distantele minime de la nodul source la celelalte noduri
@@ -137,16 +191,17 @@ public class Main {
             // BellmanFordResult cu campul has_cycle setat pe true si doi vectori fara
             // elemente;
             //
+            List<Edge> edges = new ArrayList<>();
 
-            List<Integer> d = new ArrayList<>();
-            List<Integer> p = new ArrayList<>();
-
-            for (int i = 0; i <= n; i++) {
-                d.add(0);
-                p.add(0);
+            for (int node = 1; node <= n; ++node) {
+                for (var e : adj[node]) {
+                    int neigh = e.destination;
+                    int w = e.cost;
+                    edges.add(new Edge(node, neigh, w));
+                }
             }
 
-            return new BellmanFordResult(false, d, p);
+            return bellman(source, n, edges);
 
         }
     }
