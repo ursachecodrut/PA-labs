@@ -9,9 +9,12 @@ import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+
+import javax.print.event.PrintJobAttributeListener;
 
 public class Main {
     static class Task {
@@ -41,6 +44,12 @@ public class Main {
             Edge(int _node, int _neigh) {
                 node = _node;
                 neigh = _neigh;
+            }
+
+            @Override
+            public String toString() {
+                // TODO Auto-generated method stub
+                return super.toString();
             }
 
         }
@@ -106,6 +115,50 @@ public class Main {
             }
         }
 
+        int[] BFS(int source, ArrayList<Integer> adj[], int[][] flow) {
+            int d[] = new int[n + 1];
+            int p[] = new int[n + 1];
+            Arrays.fill(d, INF);
+            Arrays.fill(p, 0);
+
+            Queue<Integer> queue = new LinkedList<Integer>();
+
+            d[source] = 0;
+            p[source] = 0;
+            queue.add(source);
+
+            while (!queue.isEmpty()) {
+                int node = queue.poll();
+                for (Integer neigh : adj[node]) {
+                    if (d[node] + 1 < d[neigh] && flow[node][neigh] < c[node][neigh]) {
+                        d[neigh] = d[node] + 1;
+
+                        p[neigh] = node;
+                        queue.add(neigh);
+                    }
+                }
+            }
+
+            for (int node = 1; node <= n; node++) {
+                if (d[node] == INF) {
+                    d[node] = -1;
+                }
+            }
+
+            return p;
+        }
+
+        public ArrayList<Edge> rebuildPath(int[] p, int target) {
+            ArrayList<Edge> augmentedPath = new ArrayList<>();
+            int x = target;
+            while (p[x] != 0) {
+                augmentedPath.add(new Edge(p[x], x));
+                x = p[x];
+            }
+
+            return augmentedPath;
+        }
+
         private int getResult() {
             //
             // TODO: Calculati fluxul maxim pe graful orientat dat.
@@ -117,11 +170,62 @@ public class Main {
             // De exemplu, un arc (x, y) de capacitate cap va fi tinut astfel:
             // c[x][y] = cap, adj[x] contine y, adj[y] contine x.
             //
+            // int totalFlow = 0;
+
             int totalFlow = 0;
+            boolean[] visited = new boolean[n + 1];
+            int[] p = new int[n + 1];
+            int[][] flow = new int[n + 1][n + 1];
+
+            while (true) {
+                Arrays.fill(visited, false);
+                Arrays.fill(p, 0);
+                final Queue<Integer> Q = new ArrayDeque<>();
+                Q.add(1);
+
+                visited[1] = true;
+
+                boolean check = false;
+                while (!Q.isEmpty()) {
+                    int node = Q.poll();
+                    if (node == n) {
+                        check = true;
+                        break;
+                    }
+                    for (int j = 0; j < adj[node].size(); j++) {
+                        int i = adj[node].get(j);
+                        if (!visited[i] && c[node][i] > flow[node][i]) {
+                            visited[i] = true;
+                            Q.add(i);
+                            p[i] = node;
+                        }
+                    }
+                }
+
+                if (!check)
+                    break;
+
+                int rc = INF;
+                for (int i = n; i != 1; i = p[i]) {
+                    int u = p[i];
+                    rc = Math.min(rc, c[u][i] - flow[u][i]);
+                }
+
+                for (int i = n; i != 1; i = p[i]) {
+                    int u = p[i];
+                    flow[u][i] += rc;
+                    flow[i][u] -= rc;
+                }
+
+                totalFlow += rc;
+
+            }
+
             return totalFlow;
         }
 
     }
+
     public static void main(String[] args) {
         new Task().solve();
     }

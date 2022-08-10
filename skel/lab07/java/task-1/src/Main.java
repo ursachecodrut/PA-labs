@@ -38,6 +38,7 @@ public class Main {
         }
 
         private void readInput() {
+
             try {
                 Scanner sc = new Scanner(new BufferedReader(new FileReader(
                         INPUT_FILE)));
